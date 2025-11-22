@@ -267,7 +267,14 @@ def fetch_page_sync(url: str):
     This prevents subprocess issues on Windows Python 3.12.
     """
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True)
+        browser = pw.chromium.launch(headless=True,args=[
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--disable-web-security",
+        "--allow-running-insecure-content",
+        ])
         page = browser.new_page()
 
         # Load page fully
