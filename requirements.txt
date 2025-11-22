@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+httpx
+python-dotenv
+beautifulsoup4
+playwright
+pandas
+numpy
+matplotlib
+networkx
+requests
+pdfplumber
+PyPDF2
+tabula-py

@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual env
+venv/
+.env
+
+# Playwright
+playwright/.local-browsers/
+**/playwright/.cache/
+**/playwright/.local-browsers/
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# Temp files
+*.log
+*.tmp
+*.swp
+
+# VS Code
+.vscode/
