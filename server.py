@@ -89,48 +89,44 @@ def parse_quiz_instructions(page_text: str, html: str, base_url: str) -> Dict[st
     print(page_text[:1000])
     print("\n-------------------------------------\n")
 
-    # 1. URLs from visible text ONLY
-    # PRIORITY 1 — extract URLs from real HTML
-    urls_html = extract_urls_from_html(html, base_url)
+    # URLs from visible text
+    text_urls = extract_urls(page_text)
 
-    # PRIORITY 2 — extract URLs from visible text
-    urls_text = extract_urls(page_text)
+    print("[DEBUG] URLs FOUND (text only):")
+    for u in text_urls:
+        print("  →", u)
 
-    # Merge BOTH sources
-    all_urls = list(set(urls_html + urls_text))
+    # Detect submit URL
+    submit_url = find_submit_url(page_text)
 
-    # Find submit URL
-    submit_url = None
-    for u in urls_html:
-        if "submit" in u.lower():
-            submit_url = u
-            break
-    if not submit_url:
-        submit_url = find_submit_url(page_text)
+    # Check HTML for <a href="...">
+    soup = BeautifulSoup(html, "html.parser")
+    html_urls = []
+    for tag in soup.find_all("a", href=True):
+        full = urljoin(base_url, tag["href"])
+        html_urls.append(full)
+        if "submit" in tag["href"].lower():
+            submit_url = full
 
-    # Detect data file URLs
+    print("\n[DEBUG] SUBMIT URL DETECTED:", submit_url)
+
+    # Combined URLs
+    all_urls = list(set(text_urls + html_urls))
+
+    # Detect data URLs from combined list
     data_urls = [
         u for u in all_urls
         if any(ext in u.lower() for ext in [".csv", ".xlsx", ".xls", ".json", ".pdf"])
     ]
 
-
-    print("\n[DEBUG] SUBMIT URL DETECTED:", submit_url)
-
-    # Identify data URLs from visible-text URLs only
-    data_urls = [
-        u for u in urls
-        if any(ext in u.lower() for ext in [".csv", ".xlsx", ".xls", ".json", ".pdf"])
-    ]
-
-    print("\n[DEBUG] DATA URLs (text only):", data_urls)
+    print("\n[DEBUG] DATA URLs:", data_urls)
     print("\n-------------------------------------\n")
 
     return {
         "question_text": page_text,
         "submit_url": submit_url,
         "data_urls": data_urls,
-        "all_urls": urls,
+        "all_urls": all_urls,
     }
 
 
@@ -403,7 +399,7 @@ async def solve_single_quiz(quiz_url: str, email: str, secret: str, start_time: 
     # NEW: extract URLs from real HTML
     urls_html = extract_urls_from_html(html, quiz_url)
     
-    parsed = parse_quiz_instructions(text, html, quiz_url)
+    pparsed = parse_quiz_instructions(text, html, quiz_url)
     
     # Merge into parsed data
     parsed["all_urls"] = list(set(parsed["all_urls"] + urls_html))
