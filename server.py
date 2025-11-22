@@ -399,7 +399,7 @@ async def solve_single_quiz(quiz_url: str, email: str, secret: str, start_time: 
     # NEW: extract URLs from real HTML
     urls_html = extract_urls_from_html(html, quiz_url)
     
-    pparsed = parse_quiz_instructions(text, html, quiz_url)
+    parsed = parse_quiz_instructions(text, html, quiz_url)
     
     # Merge into parsed data
     parsed["all_urls"] = list(set(parsed["all_urls"] + urls_html))
