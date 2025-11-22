@@ -305,7 +305,7 @@ def fetch_page_sync(url: str):
         # ---------------------------------------------------
         # ------------------- PATCHED BASE64 DETECTOR ---------------------
         # Detect atob("..."), atob('...'), or atob(`...`)
-        base64_pattern = r'atob\(["\'`]([\s\S]+?)["\'`]\)'
+        base64_pattern = r'[`\'"]([A-Za-z0-9+/=]{20,})[`\'"]'
         match = re.search(base64_pattern, html)
         
         if match:
